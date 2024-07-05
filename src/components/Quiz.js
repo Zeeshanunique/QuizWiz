@@ -10,32 +10,33 @@ const Quiz = ({ quizData, onQuizComplete }) => {
   }, [quizData]);
 
   const handleChange = (e, questionIndex) => {
-    setUserAnswers({ ...userAnswers, [questionIndex]: e.target.value });
+    setUserAnswers({ ...userAnswers, [`question_${questionIndex}`]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simulate quiz submission
-    const results = {
-      score: Math.floor(Math.random() * (quizData?.length || 5)) + 1,
-      total: quizData?.length || 5,
-      results: quizData?.map((q, idx) => ({
-        question: q.question,
-        user_answer: userAnswers[`question_${idx}`] || 'Not answered',
-        correct_answer: q.options[0], // Assuming the first option is always correct for this example
-        is_correct: userAnswers[`question_${idx}`] === q.options[0],
-      })) || [],
-    };
-    onQuizComplete(results);
+    try {
+      const response = await fetch('/submit_quiz', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userAnswers),
+      });
+      const results = await response.json();
+      onQuizComplete(results);
+    } catch (error) {
+      console.error('Error submitting quiz:', error);
+    }
   };
 
-  if (!quizData) {
+  if (!quizData || !quizData.questions) {
     return <p>No quiz available. Please generate a quiz first.</p>;
   }
 
   return (
     <form onSubmit={handleSubmit}>
-      {quizData.map((question, idx) => (
+      {quizData.questions.map((question, idx) => (
         <div key={idx} className="quiz-question">
           <h4>{question.question}</h4>
           <div className="quiz-options">
@@ -46,7 +47,7 @@ const Quiz = ({ quizData, onQuizComplete }) => {
                   id={`question_${idx}_option_${optionIdx}`}
                   name={`question_${idx}`}
                   value={option}
-                  onChange={(e) => handleChange(e, `question_${idx}`)}
+                  onChange={(e) => handleChange(e, idx)}
                 />
                 <label htmlFor={`question_${idx}_option_${optionIdx}`}>{option}</label>
               </div>

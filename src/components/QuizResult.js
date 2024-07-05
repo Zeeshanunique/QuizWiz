@@ -5,24 +5,20 @@ const QuizResult = ({ results, onNewQuiz }) => {
     return <div>No results available. Please take a quiz first.</div>;
   }
 
-  const calculatedScore = results.results.reduce((score, result) => 
-    result.is_correct ? score + 1 : score, 0);
-
-  const totalQuestions = results.results.length;
+  const { score, total, results: quizResults } = results;
 
   const handleNewQuiz = () => {
-    // Call the onNewQuiz function to reset the state in the parent component
     onNewQuiz();
   };
 
   return (
     <div className="quiz-result">
       <h2>Quiz Results</h2>
-      <h3>Your score: {calculatedScore} / {totalQuestions}</h3>
-      {results.results.map((result, idx) => (
+      <h3>Your score: {score} / {total}</h3>
+      {quizResults.map((result, idx) => (
         <div key={idx} className="result-item">
           <p><strong>Question {idx + 1}: {result.question}</strong></p>
-          <p>Your answer: <span className={result.is_correct ? 'correct' : 'incorrect'}>{result.user_answer}</span></p>
+          <p>Your answer: <span className={result.is_correct ? 'correct' : 'incorrect'}>{result.user_answer || 'Not answered'}</span></p>
           <p>Correct answer: <span className="correct">{result.correct_answer}</span></p>
         </div>
       ))}

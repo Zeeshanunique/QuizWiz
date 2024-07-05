@@ -13,7 +13,7 @@ genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 app = Flask(__name__)
 CORS(app)
-app.secret_key = os.getenv("SECRET_KEY", "fallback_secret_key")  # Use environment variable for secret key
+app.secret_key = os.getenv("SECRET_KEY", "fallback_secret_key")
 
 def get_gemini_response(input_text):
     model = genai.GenerativeModel("gemini-1.5-flash", generation_config={"response_mime_type": "application/json"})
@@ -38,25 +38,29 @@ def generate_quiz():
 
         Use this JSON schema:
         {{
-            "question": "str",
-            "options": ["str", "str", "str", "str"],
-            "answer": "str"
+            "questions": [
+                {{
+                    "question": "str",
+                    "options": ["str", "str", "str", "str"],
+                    "correct_answer": "str"
+                }}
+            ]
         }}
         
         Return a list of {quiz_data['numQuestions']} questions following this schema.
         """
         
         raw_response = get_gemini_response(prompt)
-        print("Raw Response from Gemini:", raw_response)  # Log the raw response
+        print("Raw Response from Gemini:", raw_response)
         
         data = json.loads(raw_response)
-        session['questions'] = data
+        session['questions'] = data['questions']
         return jsonify(data)
     except json.JSONDecodeError as e:
-        print("JSON Decode Error:", e)  # Log the error
+        print("JSON Decode Error:", e)
         return jsonify({"error": "Error parsing the response. Please try again."}), 400
     except Exception as e:
-        print("Error:", e)  # Log any other errors
+        print("Error:", e)
         return jsonify({"error": "An error occurred. Please try again."}), 500
 
 @app.route('/submit_quiz', methods=['POST'])
@@ -70,9 +74,9 @@ def submit_quiz():
         score = 0
         results = []
 
-        for idx, question in enumerate(questions, start=1):
-            correct_answer = question['answer']
-            user_answer = user_answers.get(f"group_{idx}")
+        for idx, question in enumerate(questions):
+            correct_answer = question['correct_answer']
+            user_answer = user_answers.get(f"question_{idx}")
             is_correct = user_answer == correct_answer
             if is_correct:
                 score += 1
@@ -85,7 +89,7 @@ def submit_quiz():
 
         return jsonify({"results": results, "score": score, "total": len(questions)})
     except Exception as e:
-        print("Error:", e)  # Log any errors
+        print("Error:", e)
         return jsonify({"error": "An error occurred. Please try again."}), 500
 
 if __name__ == '__main__':
