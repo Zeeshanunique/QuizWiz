@@ -111,7 +111,7 @@ const QuizForm = ({ setQuizData }) => {
       )}
       <div className="mb-3">
         <label htmlFor="numQuestions" className="form-label">Number of Questions</label>
-        <input type="number" className="form-control" id="numQuestions" name="numQuestions" min="1" max="10" value={formData.numQuestions} onChange={handleChange} required />
+        <input type="number" className="form-control" id="numQuestions" name="numQuestions" min="1" max="15" value={formData.numQuestions} onChange={handleChange} required />
       </div>
       <div className="mb-3">
         <label htmlFor="language" className="form-label">Language</label>
