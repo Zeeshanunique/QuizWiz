@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
+ 
 
 const QuizForm = ({ setQuizData }) => {
   const [formData, setFormData] = useState({
@@ -12,10 +11,9 @@ const QuizForm = ({ setQuizData }) => {
     level: 'Medium',
     language: 'English'
   });
+  const [loading, setLoading] = useState(false);
   const [subjects, setSubjects] = useState([]);
   const [schoolingLevels, setSchoolingLevels] = useState([]);
-
-  const navigate = useNavigate();
 
   const subjectOptions = useMemo(() => ({
     student: [
@@ -65,13 +63,15 @@ const QuizForm = ({ setQuizData }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const response = await axios.post('/generate_quiz', formData);
-      console.log('Quiz Data:', response.data);  // Log the response data
+      console.log('Quiz Data:', response.data);
       setQuizData(response.data);
-      navigate('/quiz');
     } catch (error) {
-      console.error('Error generating quiz:', error.response.data);  // Log the error response
+      console.error('Error generating quiz:', error.response.data);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -131,7 +131,13 @@ const QuizForm = ({ setQuizData }) => {
           <option value="Low">Low</option>
         </select>
       </div>
-      <button type="submit" className="btn btn-primary w-100">Generate Quiz</button>
+      <button 
+        type="submit" 
+        className={`btn btn-primary w-100 ${loading ? 'btn-loading' : ''}`}
+        disabled={loading}
+      >
+        {loading ? '' : 'Generate Quiz'}
+      </button>
     </form>
   );
 };

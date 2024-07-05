@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import QuizForm from './components/QuizForm';
 import Quiz from './components/Quiz';
 import QuizResult from './components/QuizResult';
@@ -7,25 +6,44 @@ import './App.css';
 
 function App() {
   const [quizData, setQuizData] = useState(null);
-  const [results, setResults] = useState(null);
+  const [quizResults, setQuizResults] = useState(null);
+  const [showResults, setShowResults] = useState(false);
+
+  const handleNewQuiz = () => {
+    setQuizData(null);
+    setQuizResults(null);
+    setShowResults(false);
+  };
 
   return (
-    <Router>
-      <div className="container">
-        <h1 className="text-center mb-4">QuizWiz with LLM</h1>
-        <Routes>
-          <Route path="/" element={<QuizForm setQuizData={setQuizData} />} />
-          <Route
-            path="/quiz"
-            element={<Quiz quizData={quizData} setResults={setResults} />}
+    <div className="app-container">
+      <aside className="sidebar">
+        <QuizForm setQuizData={setQuizData} />
+      </aside>
+      <main className="main-content">
+        {!quizData && !showResults && (
+          <div className="placeholder">
+            <h2>Welcome to QuizWiz</h2>
+            <p>Generate a quiz using the form on the left to get started.</p>
+          </div>
+        )}
+        {quizData && !showResults && (
+          <Quiz 
+            quizData={quizData} 
+            onQuizComplete={(results) => {
+              setQuizResults(results);
+              setShowResults(true);
+            }} 
           />
-          <Route
-            path="/result"
-            element={<QuizResult results={results} />}
+        )}
+        {showResults && (
+          <QuizResult 
+            results={quizResults} 
+            onNewQuiz={handleNewQuiz} 
           />
-        </Routes>
-      </div>
-    </Router>
+        )}
+      </main>
+    </div>
   );
 }
 

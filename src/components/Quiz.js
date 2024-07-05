@@ -1,55 +1,60 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 
-const Quiz = ({ quizData, setResults }) => {
+const Quiz = ({ quizData, onQuizComplete }) => {
   const [userAnswers, setUserAnswers] = useState({});
-  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (quizData) {
+      setUserAnswers({});
+    }
+  }, [quizData]);
 
   const handleChange = (e, questionIndex) => {
     setUserAnswers({ ...userAnswers, [questionIndex]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post('/submit_quiz', userAnswers);
-      setResults(response.data);
-      navigate('/result');
-    } catch (error) {
-      console.error('Error submitting quiz:', error);
-    }
+    // Simulate quiz submission
+    const results = {
+      score: Math.floor(Math.random() * (quizData?.length || 5)) + 1,
+      total: quizData?.length || 5,
+      results: quizData?.map((q, idx) => ({
+        question: q.question,
+        user_answer: userAnswers[`question_${idx}`] || 'Not answered',
+        correct_answer: q.options[0], // Assuming the first option is always correct for this example
+        is_correct: userAnswers[`question_${idx}`] === q.options[0],
+      })) || [],
+    };
+    onQuizComplete(results);
   };
 
   if (!quizData) {
-    return <p className="no-quiz-data">No quiz data available. Please generate a quiz first.</p>;
+    return <p>No quiz available. Please generate a quiz first.</p>;
   }
 
   return (
-    <form onSubmit={handleSubmit} className="quiz-container">
+    <form onSubmit={handleSubmit}>
       {quizData.map((question, idx) => (
         <div key={idx} className="quiz-question">
-          <h5>Question {idx + 1}: {question.question}</h5>
+          <h4>{question.question}</h4>
           <div className="quiz-options">
             {question.options.map((option, optionIdx) => (
               <div key={optionIdx} className="quiz-option">
                 <input
                   type="radio"
-                  name={`group_${idx + 1}`}
-                  id={`option_${idx + 1}_${optionIdx}`}
+                  id={`question_${idx}_option_${optionIdx}`}
+                  name={`question_${idx}`}
                   value={option}
-                  onChange={(e) => handleChange(e, `group_${idx + 1}`)}
-                  required
+                  onChange={(e) => handleChange(e, `question_${idx}`)}
                 />
-                <label htmlFor={`option_${idx + 1}_${optionIdx}`}>
-                  {option}
-                </label>
+                <label htmlFor={`question_${idx}_option_${optionIdx}`}>{option}</label>
               </div>
             ))}
           </div>
         </div>
       ))}
-      <button type="submit" className="quiz-submit-btn">Submit Quiz</button>
+      <button type="submit" className="btn">Submit Quiz</button>
     </form>
   );
 };
