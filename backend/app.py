@@ -40,7 +40,7 @@ def generate_quiz():
         {{
             "questions": [
                 {{
-                    "question": "str",
+                    "question": ["str"],
                     "options": ["str", "str", "str", "str"],
                     "correct_answer": "str"
                 }}

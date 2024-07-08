@@ -25,7 +25,8 @@ const QuizForm = ({ setQuizData }) => {
     professional: [
       { value: 'Finance_and_Accounting', label: 'Finance and Accounting' },
       { value: 'Engineering', label: 'Engineering' },
-      { value: 'Healthcare_and_Medicine', label: 'Healthcare and Medicine' }
+      { value: 'Healthcare_and_Medicine', label: 'Healthcare and Medicine' },
+      {value: 'Generative_ai', label: 'Generative AI'}
     ],
     programming: [
       { value: 'javascript', label: 'JavaScript' },
@@ -83,7 +84,7 @@ const QuizForm = ({ setQuizData }) => {
           <option value="">Select target audience...</option>
           <option value="student">Student</option>
           <option value="professional">Professional</option>
-          <option value="programming">Programming Community</option>
+          <option value="programming">Programming language</option>
           <option value="datascience">Data Science Community</option>
         </select>
       </div>
