@@ -39,7 +39,8 @@ const QuizForm = ({ setQuizData }) => {
     datascience: [
       { value: 'machinelearning', label: 'Machine Learning' },
       { value: 'statistics', label: 'Statistics' },
-      { value: 'bigdata', label: 'Big Data' }
+      { value: 'bigdata', label: 'Big Data' },
+      { value: 'numpy', label: 'Numpy' },
     ]
   }), []);
 
